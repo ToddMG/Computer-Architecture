@@ -24,29 +24,38 @@ class CPU:
         self.pc = 0
         self.running = True
 
+
     def ram_read(self, address):
+        """Read RAM address"""
         return self.ram[address]
 
+
     def ram_write(self, address, value):
+        """Write to RAM address"""
         self.ram[address] = value
 
+
     def hlt(self):
+        """Halt program"""
         self.running = False
         self.pc += 1
+
 
     def ldi(self, reg_num, val):
         self.reg[reg_num] = val
         self.pc += 3
 
+
     def prn(self, reg_num):
+        """Print value at register."""
         print(self.reg[reg_num])
         self.pc += 2
+
 
     def load(self):
         """Load a program into memory."""
 
-        address = 0
-
+        #address = 0
         # # For now, we've just hardcoded a program:
         #
         # program = [
@@ -63,7 +72,9 @@ class CPU:
         #     self.ram[address] = instruction
         #     address += 1
 
+        # Load file
         file_name = sys.argv[1]
+
         try:
             address = 0
             with open(file_name) as file:
@@ -74,10 +85,10 @@ class CPU:
                     if command == '':
                         continue
 
-                instruction = int(command,2)
-                self.ram[address] = instruction
-                address += 1
-        except:
+                    instruction = int(command,2)
+                    self.ram[address] = instruction
+                    address += 1
+        except FileNotFoundError:
             print(f'{sys.argv[0]}: {sys.argv[1]} file not found')
             sys.exit()
 
@@ -146,7 +157,6 @@ class CPU:
                 self.ram[sp] = value
                 self.pc += 2
 
-
             elif instruction_reg == POP:
                 # Get Stack Pointer
                 sp = self.reg[7]
@@ -158,7 +168,6 @@ class CPU:
                 self.reg[7] += 1
                 self.pc += 2
 
-
             elif instruction_reg == CALL:
 
                 address = self.reg[reg_a]
@@ -168,16 +177,12 @@ class CPU:
                 self.ram[sp] = return_address
                 self.pc = address
 
-
             elif instruction_reg == RET:
                 sp = self.reg[7]
                 return_address = self.ram[sp]
                 self.reg[7] += 1
                 self.pc = return_address
 
-
             else:
                 print(f'Instruction at counter {self.pc} unrecognized.')
                 self.pc += 1
-
-            self.trace()
